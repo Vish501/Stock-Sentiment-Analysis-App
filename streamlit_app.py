@@ -13,18 +13,48 @@ def check_available(ticker: str) -> bool:
     info = yf.Ticker(ticker).history(period='1d', interval='1d')
     return len(info) > 0
 
-
+# Calls the rss feed
 def feed(ticker):
     rss_url = f'https://feeds.finance.yahoo.com/rss/2.0/headline?s={ticker}&lang=en-US'
     return feedparser.parse(rss_url)
+
+# Analyze the sentiments for the webapp and return a concise message for the user
+def articles(ticker, filter):
+    ticker_feed = feed(ticker)
+
+    total_score = 0
+    num_articles = 0
+    message = ''
+
+    #######
+    ### NEED TO ADD DEFESNE HERE
+    #######
+    for entries in ticker_feed.entries:
+        if filter.lower() not in entries.summary.lower():
+            continue
+        
+        sentiment =  classifier(entries.summary)[0]
+        
+        message += '\n\n' + (f'Title: {entries.title}' + '\n\n' + 
+                                        f'Link: {entries.link}' + '\n\n' + 
+                                        f'Published: {entries.published}' + '\n\n' + 
+                                        f'Summary: {entries.summary}' + '\n\n' +
+                                        f'Sentiment: {sentiment["label"]}, Score: {sentiment["score"]}' + '\n\n' +
+                                        '-' * 40)
+
+        if sentiment["label"] == 'positive' or sentiment["label"] == 'negative':
+            total_score += sentiment["score"]
+            num_articles += 1
+
+    total = total_score / num_articles
+    message += '\n\n' + f'Overall Sentiment for {ticker} is {"Positive" if total >= 0.2 else "Negative" if total <= 0.2 else "Neutral"}: {total}'
+
+    return message
 
 
 def main():
     st.title('#📈 TICKER SENTIMENET ANALYZER')
     st.write('Enter a ticker and get the news sentiment for it.')
-
-    total_score = 0
-    num_articles = 0
 
     # Create a session state variable to store the chat messages. This ensures that the
     # messages persist across reruns.
@@ -42,7 +72,7 @@ def main():
         #######
         ### NEED TO ADD DEFESNE HERE
         #######
-        prompt, filter = prompt_input.split(', ')
+        prompt, filter = prompt_input.upper().split(', ')
 
         # Store and display the current prompt.
         st.session_state.messages.append({"role": "user", "content": prompt_input})
@@ -52,36 +82,14 @@ def main():
         # Generate response using the rss feed if ticker is valid
         if check_available(prompt) == False:
             message = f'Sorry we were not able to find the ticker: {prompt}'
-            st.session_state.messages.append({"role": "assistant", "content": message})
-            with st.chat_message("assistant"):
-                st.markdown(message)
         else:
-            ticker_feed = feed(prompt)
-            message = ''
-            with st.chat_message("assistant"):
-                st.markdown('-' * 40)
-                
-                for entries in ticker_feed.entries:
-                    if filter.lower() not in entries.summary.lower():
-                        continue
-                    
-                    sentiment =  classifier(entries.summary)[0]
-                    
-                    st.markdown(f'Title: {entries.title}')
-                    st.markdown(f'Link: {entries.link}')
-                    st.markdown(f'Published: {entries.published}')
-                    st.markdown(f'Summary: {entries.summary}')
-                    st.markdown(f'Sentiment: {sentiment["label"]}, Score: {sentiment["score"]}')
-                    st.markdown('-' * 40)
+            message = articles(prompt, filter)
 
-                    if sentiment["label"] == 'positive' or sentiment["label"] == 'negative':
-                        total_score += sentiment["score"]
-                        num_articles += 1
-
-                total = total_score / num_articles
-                message = f'Overall Sentiment is {"Positive" if total >= 0.2 else "Negative" if total <= 0.2 else "Neutral"}: {total}'
-                st.markdown(message)
+        st.session_state.messages.append({"role": "assistant", "content": message})
+        with st.chat_message("assistant"):
+            st.markdown(message)
                 
+
 
 if __name__ == '__main__':
     main()
