@@ -69,15 +69,15 @@ def main():
     # Prompts the user for a ticker input to get sentiment analysis
     if prompt_input := st.chat_input("Input Ticker, Filter (Example: META, Facebook)"):
         
-        #######
-        ### NEED TO ADD DEFESNE HERE
-        #######
-        prompt, filter = prompt_input.upper().split(', ')
-
         # Store and display the current prompt.
         st.session_state.messages.append({"role": "user", "content": prompt_input})
         with st.chat_message("user"):
             st.markdown(prompt_input)
+
+        #######
+        ### NEED TO ADD DEFESNE HERE
+        #######
+        prompt, filter = prompt_input.upper().split(', ')
 
         # Generate response using the rss feed if ticker is valid
         if check_available(prompt) == False:
