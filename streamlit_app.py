@@ -39,6 +39,9 @@ def main():
     # Prompts the user for a ticker input to get sentiment analysis
     if prompt_input := st.chat_input("Input Ticker, Filter (Example: META, Facebook)"):
         
+        #######
+        ### NEED TO ADD DEFESNE HERE
+        #######
         prompt, filter = prompt_input.split(', ')
 
         # Store and display the current prompt.
@@ -55,13 +58,15 @@ def main():
         else:
             ticker_feed = feed(prompt)
             message = ''
-            for entries in ticker_feed.entries:
-                if filter.lower() not in entries.summary.lower():
-                    continue
+            with st.chat_message("assistant"):
+                st.markdown('-' * 40)
                 
-                sentiment =  classifier(entries.summary)[0]
-                
-                with st.chat_message("assistant"):
+                for entries in ticker_feed.entries:
+                    if filter.lower() not in entries.summary.lower():
+                        continue
+                    
+                    sentiment =  classifier(entries.summary)[0]
+                    
                     st.markdown(f'Title: {entries.title}')
                     st.markdown(f'Link: {entries.link}')
                     st.markdown(f'Published: {entries.published}')
@@ -73,9 +78,8 @@ def main():
                         total_score += sentiment["score"]
                         num_articles += 1
 
-            total = total_score / num_articles
-            message = f'Overall Sentiment is {"Positive" if total >= 0.2 else "Negative" if total <= 0.2 else "Neutral"}: {total}'
-            with st.chat_message("assistant"):
+                total = total_score / num_articles
+                message = f'Overall Sentiment is {"Positive" if total >= 0.2 else "Negative" if total <= 0.2 else "Neutral"}: {total}'
                 st.markdown(message)
                 
 
