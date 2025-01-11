@@ -1,6 +1,5 @@
 feedparser
 streamlit
 tensorflow
-tensorflow-gpu
 tf-keras
 transformers
