@@ -54,7 +54,7 @@ def articles(ticker, filter):
 
 def main():
     st.title('#📈 TICKER SENTIMENET ANALYZER')
-    st.write('Enter a ticker and get the news sentiment for it.')
+    st.write('Enter a NYSE ticker as well as a filter, and get the sentiment for it from news articles published by Yahoo Finance.')
 
     # Create a session state variable to store the chat messages. This ensures that the
     # messages persist across reruns.
