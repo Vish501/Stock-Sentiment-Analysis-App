@@ -2,7 +2,7 @@
 
 This Python application analyzes the sentiment of news related to a specific stock using the Yahoo Finance 2.0 RSS feed. 
 
-Application website: https://stock-sentiment-analysis-app.streamlit.app/
+Deployed on: https://stock-sentiment-analysis-app.streamlit.app/
 
 **Key Features:**
 
