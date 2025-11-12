@@ -1,5 +1,6 @@
 feedparser
 streamlit
+torch
 tensorflow
 tf-keras
 transformers
