@@ -4,4 +4,4 @@ torch
 tensorflow
 tf-keras
 transformers
-yfinance
+yfinance==0.2.38
